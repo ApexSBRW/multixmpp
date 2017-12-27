@@ -39,58 +39,39 @@ public class ServerEndpoint
     {
         System.out.println(format("%s connected", session.getId()));
         peers.add(session);
+
+        try
+        {
+            session.getBasicRemote().sendText("Hello racer!");
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @OnMessage
     public void onMessage(Message message, Session session) throws IOException, EncodeException
     {
-        Integer state = (Integer) session.getUserProperties().get("state");
-
-        if (state == null)
+//            System.out.println(message.getContent());
+        String action = message.getAction();
+        String content = message.getContent();
+        String token = message.getToken();
+        
+        if (!token.equals(Config.getAuthToken()))
         {
-            session.getUserProperties().put("state", state = STATE_UNAUTHENTICATED);
+            return;
         }
 
-        if (state == STATE_UNAUTHENTICATED)
+        switch (action)
         {
-            if ("authenticate".equals(message.getAction()))
-            {
-                String token = message.getContent();
-
-                if (!token.equals(Config.getAuthToken()))
-                {
-                    System.err.println(format("[%s] sent an invalid authentication token!", session.getId()));
-                    session.getBasicRemote().sendText(Json.createObjectBuilder().add("error", "Invalid authentication token").build().toString());
-                    session.close();
-                } else
-                {
-                    System.out.println(format("[%s] authenticated!", session.getId()));
-                    session.getBasicRemote().sendText(Json.createObjectBuilder().add("message", "Authenticated!").build().toString());
-                    session.getUserProperties().put("state", STATE_AUTHENTICATED);
-                }
-            } else
-            {
-                System.err.println(format("[%s] tried to bypass authentication!", session.getId()));
-                session.getBasicRemote().sendText(Json.createObjectBuilder().add("error", "Thou shalt not send a message before authenticating!").build().toString());
-                session.close();
-            }
-        } else
-        {
-//            System.out.println(message.getContent());
-            String action = message.getAction();
-            String content = message.getContent();
-
-            switch (action)
-            {
-                case "SEND_MESSAGE":
-                    SendMessagePayload smp = Utils.gson.fromJson(content, SendMessagePayload.class);
-                    OpenFireSoapBoxCli.getInstance().sendRaw(smp.getData());
-                    break;
-                case "KEEP_ALIVE":
-                    session.getBasicRemote().sendText("KeepAlive return");
-                default:
-                    break;
-            }
+            case "SEND_MESSAGE":
+                SendMessagePayload smp = Utils.gson.fromJson(content, SendMessagePayload.class);
+                OpenFireSoapBoxCli.getInstance().sendRaw(smp.getData());
+                break;
+            case "KEEP_ALIVE":
+                session.getBasicRemote().sendText("KeepAlive return");
+            default:
+                break;
         }
 //        String user = (String) session.getUserProperties().get("user");
 //        if (user == null) {

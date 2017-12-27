@@ -20,6 +20,7 @@ public class MessageDecoder implements Decoder.Text<Message>
         JsonObject jsonObject = Json.createReader(new StringReader(textMessage)).readObject();
         message.setAction(jsonObject.getString("action"));
         message.setContent(jsonObject.getString("content"));
+        message.setToken(jsonObject.getString("token"));
         return message;
     }
 
