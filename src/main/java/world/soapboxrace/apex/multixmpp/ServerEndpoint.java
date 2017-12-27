@@ -39,13 +39,6 @@ public class ServerEndpoint
     {
         System.out.println(format("%s connected", session.getId()));
         peers.add(session);
-        try
-        {
-            session.getBasicRemote().sendText("Hello racer!");
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
     }
 
     @OnMessage
