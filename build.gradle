@@ -2,6 +2,7 @@ group 'world.soapboxrace.apex'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = 1.8
 mainClassName = 'world.soapboxrace.apex.multixmpp.Main'
