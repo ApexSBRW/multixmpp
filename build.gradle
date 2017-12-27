@@ -4,6 +4,7 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 
 sourceCompatibility = 1.8
+mainClassName = 'world.soapboxrace.apex.multixmpp.Main'
 
 buildscript {
     repositories {
@@ -17,6 +18,10 @@ buildscript {
 }
 
 apply plugin: "com.github.johnrengelman.shadow"
+
+shadowJar {
+    mainClassName = 'world.soapboxrace.apex.multixmpp.Main'
+}
 
 repositories {
     mavenCentral()
